@@ -11,6 +11,7 @@ from random import seed
 from random import randint
 import numpy as np
 import matplotlib.pyplot as plt
+""
 
 "Le seed va nous permettre de recréer la même situation si on la rappelle"
 seed(1)

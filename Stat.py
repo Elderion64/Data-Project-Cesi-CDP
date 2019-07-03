@@ -9,7 +9,7 @@ from faker import Faker
 from liste_generator import GenerateListMatRoad, GenerateListMatEssence
 
 class StatistiqueMatRoad :
-    
+    print("\n statistique sur les villes")
     nbrItems = int(len(toListMatRoad))
     print("nombres d'echantillons : ", nbrItems)
     
@@ -44,7 +44,7 @@ class StatistiqueMatRoad :
     print("maximum :",maximum)
 
 class StatistiqueMatEssence :
-    
+    print("\n statistique sur l'essence")
     nbrItems = int(len(toListMatEssence))
     print("nombres d'echantillons : ", nbrItems)
     

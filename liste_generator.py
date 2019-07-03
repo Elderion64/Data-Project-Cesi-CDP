@@ -52,4 +52,4 @@ class GenerateListMatEssence :
         i += 1
         nbrMatEssence -= 1
 
-    print (toListMatEssence)
+    print ("\n",toListMatEssence)

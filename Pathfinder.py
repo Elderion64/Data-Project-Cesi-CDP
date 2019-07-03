@@ -4,10 +4,10 @@ from __future__ import print_function
 from ortools.constraint_solver import routing_enums_pb2
 from ortools.constraint_solver import pywrapcp
 from random_matrice import MatRoad
+from matrice_file_generator import create_csv
 
 import random
 import time
-import numpy as np
 
 
 def create_data_model():
@@ -19,9 +19,10 @@ def create_data_model():
     return data
 
 
-def print_solution(data, manager, routing, solution, start_time):
+def print_solution(data, manager, routing, solution, total_time):
     """Prints solution on console."""
     min_route_distance = 0
+    list_distance = []
     for vehicle_id in range(data['num_vehicles']):
         index = routing.Start(vehicle_id)
         route_distance = 0
@@ -35,13 +36,22 @@ def print_solution(data, manager, routing, solution, start_time):
         plan_output += '{}\n'.format(manager.IndexToNode(index))
         plan_output += 'Distance of the route: {}km\n'.format(route_distance)
         print(plan_output)
+        list_distance.append(route_distance)
         min_route_distance = [route_distance, min_route_distance]
-        min_route_distance = min(i for i in min_route_distance if i != 0)
+        if min_route_distance != [0,0]:
+            min_route_distance = min(i for i in min_route_distance if i != 0)
+        else :
+            min_route_distance = 0
     print('Minimum of the route distances: {}km'.format(min_route_distance))
     print("\n"+"Infos en plus")
     print(data['num_vehicles'])
     print(MatRoad.citiesR)
-    print("Temps d execution : %s secondes" % (int(time.time() - start_time)))
+    print("Temps d execution : %s secondes" % (total_time))
+    
+    list_distance = [filter(lambda a: a != 0, list_distance)]
+    total_time = [total_time]
+    data['num_vehicles'] = [data['num_vehicles']]
+    create_csv(total_time, data['num_vehicles'], list_distance)
 
 
 
@@ -93,7 +103,8 @@ def main():
 
     # Print solution on console.
     if solution:
-        print_solution(data, manager, routing, solution, start_time)
+        total_time = int(time.time() - start_time)
+        print_solution(data, manager, routing, solution, total_time)
 
 
 if __name__ == '__main__':

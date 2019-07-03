@@ -22,12 +22,15 @@ def create_data_model():
 def print_solution(data, manager, routing, solution, total_time):
     """Prints solution on console."""
     min_route_distance = 0
+    iteration = 0
     list_distance = []
     for vehicle_id in range(data['num_vehicles']):
+        
         index = routing.Start(vehicle_id)
         route_distance = 0
         plan_output = 'Route for vehicle {}:\n'.format(vehicle_id)
         while not routing.IsEnd(index):
+            iteration = iteration + 1
             plan_output += ' {} -> '.format(manager.IndexToNode(index))
             previous_index = index
             index = solution.Value(routing.NextVar(index))
@@ -44,6 +47,7 @@ def print_solution(data, manager, routing, solution, total_time):
             min_route_distance = 0
     print('Minimum of the route distances: {}km'.format(min_route_distance))
     print("\n"+"Infos en plus")
+    print("Nombre d'itération : "+str(iteration))
     print(data['num_vehicles'])
     print(MatRoad.citiesR)
     print("Temps d execution : %s secondes" % (total_time))

@@ -27,26 +27,12 @@ with open('distance.csv', 'w') as csvFile :
     csvFile.close()
 
 
-def create_csv(time, vehicles, list_distance) :
-    with open('DataPathfinder_time.csv', 'w') as csvFileDataTime :
-        writer = csv.writer(csvFileDataTime)
-        column_list = ['Temps de calcul']
+def create_csv(csv_list) :
+    with open('DataPathfinder.csv', 'w') as csvFileData :
+        writer = csv.writer(csvFileData, delimiter=';')
+        column_list = ['Véhicule','Distance parcouru par les véhicules','Temps de calcul']
         writer.writerow(column_list)
-        writer.writerow(time)
-        csvFileDataTime.close()
+        for row in csv_list:
+            writer.writerow(row)
+        csvFileData.close()
             
-    with open('DataPathfinder_vehicles.csv', 'w') as csvFileDataVehicles :
-        writer = csv.writer(csvFileDataVehicles)
-        column_list = ['Nombre de véhicule']
-        writer.writerow(column_list)
-        writer.writerow(vehicles)
-        
-        csvFileDataVehicles.close()
-
-    with open('DataPathfinder_road.csv', 'w') as csvFileDataRoad :
-        writer = csv.writer(csvFileDataRoad, delimiter='\n')
-        column_list = ['Distance parcouru par les véhicules']
-        writer.writerow(column_list)
-        writer.writerows(list_distance)
-        
-        csvFileDataRoad.close()

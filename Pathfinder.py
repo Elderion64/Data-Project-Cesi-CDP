@@ -26,7 +26,7 @@ def print_solution(data, manager, routing, solution, total_time):
     for vehicle_id in range(data['num_vehicles']):
         index = routing.Start(vehicle_id)
         route_distance = 0
-        plan_output = 'Route for vehicle {}:\n'.format(vehicle_id)
+        plan_output = 'Route for vehicle {}:\n'.format(vehicle_id+1)
         while not routing.IsEnd(index):
             plan_output += ' {} -> '.format(manager.IndexToNode(index))
             previous_index = index
@@ -48,18 +48,22 @@ def print_solution(data, manager, routing, solution, total_time):
     print(MatRoad.citiesR)
     print("Temps d execution : %s secondes" % (total_time))
     
-    list_distance = [filter(lambda a: a != 0, list_distance)]
-    total_time = [total_time]
-    data['num_vehicles'] = [data['num_vehicles']]
-    create_csv(total_time, data['num_vehicles'], list_distance)
+    vehicles_time_list = []
+    vehicles_list = []
+    for i in range(data['num_vehicles']) :
+        vehicles_list.append(i+1)
+        vehicles_time_list.append(total_time)
+    csv_list = zip(vehicles_list,list_distance,vehicles_time_list)
+    
+    create_csv(csv_list)
 
 
 
 def main():
     """Solve the CVRP problem."""
-    # Instantiate the data problem.
-    start_time = time.time()
+    # Instantiate the data problem.    
     data = create_data_model()
+    start_time = time.time()
 
     # Create the routing index manager.
     manager = pywrapcp.RoutingIndexManager(

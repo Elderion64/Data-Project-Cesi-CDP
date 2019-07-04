@@ -2,6 +2,7 @@
 """
 Created on Tue Jul  2 13:29:20 2019
 @author: antoi
+Transform the matrix into a list
 """
 import numpy as np
 from random_matrice import MatRoad
@@ -27,5 +28,3 @@ class GenerateListMatRoad :
         i += 1
         nbrMatRoad -= 1
         
-    "print (toListMatRoad)"
-

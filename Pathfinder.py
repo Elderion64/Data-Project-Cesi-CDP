@@ -5,10 +5,12 @@ from ortools.constraint_solver import routing_enums_pb2
 from ortools.constraint_solver import pywrapcp
 from random_matrice import MatRoad
 from matrice_file_generator import create_csv
+import matplotlib.pyplot as plt
 
 import random
 import time
 import Stat
+import csv
 
 def create_data_model():
     """Stores the data for the problem."""
@@ -22,6 +24,8 @@ def create_data_model():
 def print_solution(data, manager, routing, solution, total_time):
     """Prints solution on console."""
     min_route_distance = 0
+    route_list = []
+    max_route_distance = 0
     iteration = 0
     list_distance = []
     for vehicle_id in range(data['num_vehicles']):
@@ -37,13 +41,15 @@ def print_solution(data, manager, routing, solution, total_time):
                 previous_index, index, vehicle_id)
         plan_output += '{}\n'.format(manager.IndexToNode(index))
         plan_output += 'Distance of the route: {}km\n'.format(route_distance)
-        "print(plan_output)"
+        print(plan_output)
         list_distance.append(route_distance)
         min_route_distance = [route_distance, min_route_distance]
         if min_route_distance != [0,0]:
             min_route_distance = min(i for i in min_route_distance if i != 0)
         else :
             min_route_distance = 0
+        route_list.append(route_distance)
+        max_route_distance = max(route_distance, max_route_distance)
     print('Minimum of the route distances: {}km'.format(min_route_distance))
     print("\n"+"General informations for the vehicles")
     print("Number of iterations : "+str(iteration))
@@ -51,13 +57,21 @@ def print_solution(data, manager, routing, solution, total_time):
     print("Number of cities",MatRoad.citiesR)
     print("Execution time : %s secondes" % (total_time),"\n")
     
+    
+    """ create the histogram and call the creation of the csv file """
     vehicles_time_list = []
     vehicles_list = []
     for i in range(data['num_vehicles']) :
         vehicles_list.append(i+1)
         vehicles_time_list.append(total_time)
-    csv_list = zip(vehicles_list,list_distance,vehicles_time_list)
-    
+    plt.bar(vehicles_list,route_list,align='center')
+    plt.xlabel('Vehicle id')
+    plt.ylabel('Minimum of the route distances')
+    for i in range(len(route_list)):
+        plt.hlines(route_list[i],0,vehicles_list[i]) 
+    plt.show()
+
+    csv_list = [data['num_vehicles'],total_time,min_route_distance,max_route_distance]
     create_csv(csv_list)
 
 
@@ -67,6 +81,11 @@ def main():
     # Instantiate the data problem.    
     "data = create_data_model()"
     with open('DataPathfinder.csv', 'w') as csvFileData :
+        writer = csv.writer(csvFileData, delimiter=';')
+        column_list = ['Number of vehicles','Execution time', 
+                       'Minimum distance', 
+                       'Maximum distance']
+        writer.writerow(column_list)
         csvFileData.close()
     data = {}
     data['distance_matrix'] = MatRoad.matrice_symm

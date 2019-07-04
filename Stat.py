@@ -2,6 +2,7 @@
 """
 Created on Tue Jul  2 13:29:20 2019
 @author: antoi
+Print the statistics of the cities
 """
 import numpy as np
 from liste_generator import GenerateListMatRoad

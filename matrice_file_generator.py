@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+" Create data from our generated data "
 import numpy as np
 import csv
 from random_matrice import Cities, MatRoad
@@ -30,9 +31,6 @@ with open('distance.csv', 'w') as csvFile :
 def create_csv(csv_list) :
     with open('DataPathfinder.csv', 'a') as csvFileData :
         writer = csv.writer(csvFileData, delimiter=';')
-        column_list = ['Véhicule','Distance parcouru par les véhicules','Temps de calcul']
-        writer.writerow(column_list)
-        for row in csv_list:
-            writer.writerow(row)
+        writer.writerow(csv_list)
         csvFileData.close()
             

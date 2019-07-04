@@ -8,7 +8,7 @@ from matrice_file_generator import create_csv
 
 import random
 import time
-
+import Stat
 
 def create_data_model():
     """Stores the data for the problem."""
@@ -22,12 +22,14 @@ def create_data_model():
 def print_solution(data, manager, routing, solution, total_time):
     """Prints solution on console."""
     min_route_distance = 0
+    iteration = 0
     list_distance = []
     for vehicle_id in range(data['num_vehicles']):
         index = routing.Start(vehicle_id)
         route_distance = 0
         plan_output = 'Route for vehicle {}:\n'.format(vehicle_id+1)
         while not routing.IsEnd(index):
+            iteration += 1
             plan_output += ' {} -> '.format(manager.IndexToNode(index))
             previous_index = index
             index = solution.Value(routing.NextVar(index))
@@ -35,7 +37,7 @@ def print_solution(data, manager, routing, solution, total_time):
                 previous_index, index, vehicle_id)
         plan_output += '{}\n'.format(manager.IndexToNode(index))
         plan_output += 'Distance of the route: {}km\n'.format(route_distance)
-        print(plan_output)
+        "print(plan_output)"
         list_distance.append(route_distance)
         min_route_distance = [route_distance, min_route_distance]
         if min_route_distance != [0,0]:
@@ -43,10 +45,11 @@ def print_solution(data, manager, routing, solution, total_time):
         else :
             min_route_distance = 0
     print('Minimum of the route distances: {}km'.format(min_route_distance))
-    print("\n"+"Infos en plus")
-    print(data['num_vehicles'])
-    print(MatRoad.citiesR)
-    print("Temps d execution : %s secondes" % (total_time))
+    print("\n"+"General informations for the vehicles")
+    print("Number of iterations : "+str(iteration))
+    print("Number of vehicles :",data['num_vehicles'])
+    print("Number of cities",MatRoad.citiesR)
+    print("Execution time : %s secondes" % (total_time),"\n")
     
     vehicles_time_list = []
     vehicles_list = []
@@ -62,54 +65,64 @@ def print_solution(data, manager, routing, solution, total_time):
 def main():
     """Solve the CVRP problem."""
     # Instantiate the data problem.    
-    data = create_data_model()
-    start_time = time.time()
-
-    # Create the routing index manager.
-    manager = pywrapcp.RoutingIndexManager(
-        len(data['distance_matrix']), data['num_vehicles'], data['depot'])
-
-    # Create Routing Model.
-    routing = pywrapcp.RoutingModel(manager)
-
-
-    # Create and register a transit callback.
-    def distance_callback(from_index, to_index):
-        """Returns the distance between the two nodes."""
-        # Convert from routing variable Index to distance matrix NodeIndex.
-        from_node = manager.IndexToNode(from_index)
-        to_node = manager.IndexToNode(to_index)
-        return data['distance_matrix'][from_node][to_node]
-
-    transit_callback_index = routing.RegisterTransitCallback(distance_callback)
-
-    # Define cost of each arc.
-    routing.SetArcCostEvaluatorOfAllVehicles(transit_callback_index)
-
-    # Add Distance constraint.
-    distance_name = 'Distance'
-    routing.AddDimension(
-        transit_callback_index,
-        0,  # no slack
-        120,  # vehicle maximum travel distance
-        True,  # start cumul to zero
-        distance_name)
-    distance_dimension = routing.GetDimensionOrDie(distance_name)
-    distance_dimension.SetGlobalSpanCostCoefficient(100)
+    "data = create_data_model()"
+    with open('DataPathfinder.csv', 'w') as csvFileData :
+        csvFileData.close()
+    data = {}
+    data['distance_matrix'] = MatRoad.matrice_symm
+    data['depot'] = random.randint(0, MatRoad.citiesR-1)
     
-    # Setting first solution heuristic.
-    search_parameters = pywrapcp.DefaultRoutingSearchParameters()
-    search_parameters.first_solution_strategy = (
-        routing_enums_pb2.FirstSolutionStrategy.SAVINGS)
+    i = 1
+    while i < 100 :
+        data['num_vehicles'] = i
+        i += 1
+        start_time = time.time()
+    
+        # Create the routing index manager.
+        manager = pywrapcp.RoutingIndexManager(
+                len(data['distance_matrix']), data['num_vehicles'], data['depot'])
 
-    # Solve the problem.
-    solution = routing.SolveWithParameters(search_parameters)
+        # Create Routing Model.
+        routing = pywrapcp.RoutingModel(manager)
 
-    # Print solution on console.
-    if solution:
-        total_time = int(time.time() - start_time)
-        print_solution(data, manager, routing, solution, total_time)
 
+        # Create and register a transit callback.
+        def distance_callback(from_index, to_index):
+            """Returns the distance between the two nodes."""
+            # Convert from routing variable Index to distance matrix NodeIndex.
+            from_node = manager.IndexToNode(from_index)
+            to_node = manager.IndexToNode(to_index)
+            return data['distance_matrix'][from_node][to_node]
+
+        transit_callback_index = routing.RegisterTransitCallback(distance_callback)
+
+        # Define cost of each arc.
+        routing.SetArcCostEvaluatorOfAllVehicles(transit_callback_index)
+
+        # Add Distance constraint.
+        distance_name = 'Distance'
+        routing.AddDimension(
+                transit_callback_index,
+                0,  # no slack
+                120,  # vehicle maximum travel distance
+                True,  # start cumul to zero
+                distance_name)
+        distance_dimension = routing.GetDimensionOrDie(distance_name)
+        distance_dimension.SetGlobalSpanCostCoefficient(100)
+        
+        # Setting first solution heuristic.
+        search_parameters = pywrapcp.DefaultRoutingSearchParameters()
+        search_parameters.first_solution_strategy = (
+                routing_enums_pb2.FirstSolutionStrategy.SAVINGS)
+
+        # Solve the problem.
+        solution = routing.SolveWithParameters(search_parameters)
+
+        # Print solution on console.
+        if solution:
+            total_time = round(time.time() - start_time,2)
+            print_solution(data, manager, routing, solution, total_time)
+    Stat.StatistiqueMatRoad()
 
 if __name__ == '__main__':
     main()

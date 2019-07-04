@@ -28,7 +28,7 @@ with open('distance.csv', 'w') as csvFile :
 
 
 def create_csv(csv_list) :
-    with open('DataPathfinder.csv', 'w') as csvFileData :
+    with open('DataPathfinder.csv', 'a') as csvFileData :
         writer = csv.writer(csvFileData, delimiter=';')
         column_list = ['Véhicule','Distance parcouru par les véhicules','Temps de calcul']
         writer.writerow(column_list)

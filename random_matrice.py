@@ -7,7 +7,7 @@ from faker import Faker
 
 
 "Le seed va nous permettre de recréer la même situation si on la rappelle"
-np.random.seed(9)
+np.random.seed(10)
 rand = np.random.randint(1,100)
 
 """
@@ -16,7 +16,7 @@ print("")
 """
 
 class MatRoad :
-    citiesR = rand
+    citiesR = 100
     "randint c'est un random d'entier et matrice.T est l'inverse de la matrice"
     matrice = np.random.randint(10,50,size=(citiesR,citiesR))
     matrice_symm = (matrice + matrice.T)/2
@@ -27,11 +27,11 @@ class MatRoad :
     """
 
 class Cities :
-    citiesR = rand
+    citiesR = 100
     fake = Faker()
     cities_list = []
     i = 0
-    fake.seed(9)
+    fake.seed(10)
     
     while i < citiesR :
         city = fake.city();
